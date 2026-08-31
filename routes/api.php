@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -11,3 +12,4 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('/users', UserController::class);
 Route::apiResource('/destinations', DestinationController::class);
+Route::apiResource('admin/booking', BookingController::class);
