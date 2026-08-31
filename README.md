@@ -1,58 +1,247 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# PesanWisata API
 
-## About Laravel
+A Laravel-based RESTful API service for tourism destination management and tour booking system with Sanctum token authentication, destination catalog with image handling, role-based workflows, and booking management.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[![Laravel](https://img.shields.io/badge/Laravel-11%2B-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![Sanctum](https://img.shields.io/badge/Sanctum-Auth-F05340?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/docs/sanctum)
+[![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+</div>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📌 Project Overview
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**PesanWisata API** is a Laravel-powered RESTful API backend designed to manage tourist destinations, user accounts, and travel/tour booking transactions.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The system provides role-based workflows for **Admin** and **User (Customer)**, handling authentication, destination catalog management with media upload, slug-based destination routing, and tour booking operations.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+This backend serves as the core API service and connects directly with the companion frontend client:
 
-## Agentic Development
+- 🌐 **Frontend Repository**: [pesanWisata-FE](https://github.com/andraadev/pesanWisata-FE)
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+## ✨ Key Features
 
-php artisan boost:install
+- **Token-Based Authentication (Laravel Sanctum)**
+    - Secure user registration and login endpoints.
+    - Bearer token issuance and revocation for authenticated API requests.
+    - Password hashing using `bcrypt`.
+
+- **Destination Management**
+    - Complete CRUD operations for tourist destinations.
+    - Automatic URL-friendly slug generation from destination names.
+    - Image upload handling with storage management and cleanup on deletion/update.
+    - Detailed destination attributes: title, slug, location, description, and photo.
+
+- **Tour Booking System**
+    - Create, view, update, and cancel destination bookings.
+    - Association between users, destinations, booking dates, and status.
+    - Joined relational queries for seamless data retrieval.
+
+- **Role-Based Access Control (RBAC)**
+    - Separate roles: **Admin** and **User**.
+    - Secured admin endpoints protected by `auth:sanctum` middleware.
+
+- **User Management**
+    - Admin CRUD access for system users and role administration.
+    - Unique email validation and secure credential management.
+
+- **Standardized API Response**
+    - Consistent JSON response format (`APIResource`) across all endpoints:
+        ```json
+        {
+          "success": true,
+          "message": "Operation message",
+          "data": { ... }
+        }
+        ```
+
+---
+
+## 👥 User Roles
+
+| Role                | Responsibilities                                                                                                                 |
+| :------------------ | :------------------------------------------------------------------------------------------------------------------------------- |
+| **Admin**           | Manage tourism destinations (CRUD, image uploads), manage users and roles, review and update all tourist booking records.        |
+| **User (Customer)** | Register and login, browse destination catalog and details by slug, create tour bookings, and view personal booking information. |
+
+---
+
+## 🛣️ API Endpoints Reference
+
+### 1. Authentication
+
+| Method | Endpoint        | Description                               | Auth Required |
+| :----- | :-------------- | :---------------------------------------- | :------------ |
+| `POST` | `/api/register` | Register a new user account               | No            |
+| `POST` | `/api/login`    | Authenticate user and obtain Bearer token | No            |
+
+### 2. Destinations
+
+| Method     | Endpoint                       | Description                                               | Auth Required   |
+| :--------- | :----------------------------- | :-------------------------------------------------------- | :-------------- |
+| `GET`      | `/api/destinations`            | List all available destinations                           | No              |
+| `GET`      | `/api/destination/{slug}`      | Get destination details by slug                           | No              |
+| `POST`     | `/api/admin/destinations`      | Create a new destination (multipart/form-data with image) | Yes (`Sanctum`) |
+| `GET`      | `/api/admin/destinations/{id}` | Get destination detail by ID                              | Yes (`Sanctum`) |
+| `PUT/POST` | `/api/admin/destinations/{id}` | Update destination information or photo                   | Yes (`Sanctum`) |
+| `DELETE`   | `/api/admin/destinations/{id}` | Delete a destination and its image                        | Yes (`Sanctum`) |
+
+### 3. Bookings
+
+| Method   | Endpoint               | Description                                             | Auth Required   |
+| :------- | :--------------------- | :------------------------------------------------------ | :-------------- |
+| `GET`    | `/api/booking`         | List all booking records with user and destination info | No / Optional   |
+| `POST`   | `/api/booking`         | Create a new tour booking                               | No / Optional   |
+| `GET`    | `/api/booking/{id}`    | Get booking details                                     | No / Optional   |
+| `PUT`    | `/api/booking/{id}`    | Update booking data / status                            | No / Optional   |
+| `DELETE` | `/api/booking/{id}`    | Remove a booking record                                 | No / Optional   |
+| `*`      | `/api/admin/booking/*` | Administrative booking resource management              | Yes (`Sanctum`) |
+
+### 4. User Management
+
+| Method   | Endpoint                | Description                      | Auth Required   |
+| :------- | :---------------------- | :------------------------------- | :-------------- |
+| `GET`    | `/api/admin/users`      | List all registered users        | Yes (`Sanctum`) |
+| `POST`   | `/api/admin/users`      | Create a new user account        | Yes (`Sanctum`) |
+| `GET`    | `/api/admin/users/{id}` | Get user detail by ID            | Yes (`Sanctum`) |
+| `PUT`    | `/api/admin/users/{id}` | Update user information and role | Yes (`Sanctum`) |
+| `DELETE` | `/api/admin/users/{id}` | Delete a user account            | Yes (`Sanctum`) |
+
+---
+
+## 🛠️ Tech Stack
+
+- **PHP 8.3+**
+- **Laravel Framework 11+**
+- **Laravel Sanctum** (API Token Authentication)
+- **MySQL / SQLite**
+- **RESTful API Architecture**
+
+---
+
+## 📦 Packages
+
+| Package                                             | Purpose                        | Status  |
+| :-------------------------------------------------- | :----------------------------- | :------ |
+| [Laravel Sanctum](https://laravel.com/docs/sanctum) | Token-based API authentication | Used ✅ |
+| [Laravel Framework](https://laravel.com/)           | Core application framework     | Used ✅ |
+| [Laravel Tinker](https://github.com/laravel/tinker) | Interactive CLI runtime shell  | Used ✅ |
+
+---
+
+## ⚡ Quick Install
+
+### Prerequisites
+
+- PHP 8.3 or higher
+- Composer
+- MySQL
+- GD / Fileinfo PHP Extensions (for image uploads)
+
+### Installation Steps
+
+1. **Clone the repository**
+
+    ```bash
+    git clone https://github.com/andraadev/pesanwisata-api.git
+    cd pesanwisata-api
+    ```
+
+2. **Install PHP dependencies**
+
+    ```bash
+    composer install
+    ```
+
+3. **Configure the environment**
+
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+
+    Configure your database credentials in `.env`:
+
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=pesanwisata
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+
+    _(Alternatively, use `DB_CONNECTION=sqlite`)_
+
+4. **Run migrations and seeders**
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+5. **Create the public storage link**
+
+    ```bash
+    php artisan storage:link
+    ```
+
+6. **Start the development server**
+
+    ```bash
+    php artisan serve
+    ```
+
+7. The API will be accessible at:
+
+    `http://127.0.0.1:8000/api`
+
+---
+
+## 🔐 Authentication & Default Credentials
+
+> Default seeded accounts are intended for development and testing purposes only.
+
+- **Test User**
+    - Email: `test@example.com`
+    - Password: `password`
+
+### Using the API Token
+
+When making requests to protected routes, include the Bearer token in the `Authorization` header:
+
+```http
+Authorization: Bearer <your_access_token>
+Accept: application/json
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 🔗 Related Repository
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Frontend Client**: [pesanWisata-FE](https://github.com/andraadev/pesanWisata-FE) — The client-side user interface connecting to this API backend.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 📌 Project Status
 
-## Security Vulnerabilities
+> **Maintained, but development is limited**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+This project was developed as a backend API service for a tourism and travel destination booking platform.
 
-## License
+The application has reached a functional state for its intended scope and is maintained for critical bug fixes, security improvements, and necessary adjustments. Future feature development is not guaranteed and may depend on project needs.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The project is primarily provided for educational, reference, and portfolio purposes and is **not recommended for production use without further security review, testing, and environment-specific configuration**.
+
+---
+
+## ⚠️ Disclaimer
+
+This software is provided "as is", without warranty of any kind, express or implied.
+
+The user assumes all responsibility and risk for the use of the software. No official support or maintenance is provided.
