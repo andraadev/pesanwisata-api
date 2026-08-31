@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\DestinationResource;
+use App\Http\Resources\APIResource;
 use App\Models\Destination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ class DestinationController extends Controller
     {
         $destination = Destination::all();
 
-        return new DestinationResource(true, 'List Data Destination', $destination);
+        return new APIResource(true, 'List Data Destination', $destination);
     }
 
     /**
@@ -48,7 +48,7 @@ class DestinationController extends Controller
             'image_url'     => $image->hashName(),
         ]);
 
-        return new DestinationResource(true, 'Data Post Berhasil Ditambahkan!', $destination);
+        return new APIResource(true, 'Data Post Berhasil Ditambahkan!', $destination);
     }
 
     /**
@@ -64,7 +64,7 @@ class DestinationController extends Controller
             ], 404);
         }
 
-        return new DestinationResource(true, 'Data Destinasi', $destination);
+        return new APIResource(true, 'Data Destinasi', $destination);
     }
 
     /**
@@ -103,7 +103,7 @@ class DestinationController extends Controller
                 'description' => $request->description,
             ]);
         }
-        return new DestinationResource(true, 'Data destinasi berhasil diubah', $destination);
+        return new APIResource(true, 'Data destinasi berhasil diubah', $destination);
     }
 
     /**
@@ -115,6 +115,6 @@ class DestinationController extends Controller
 
         $destination->delete();
 
-        return new DestinationResource(true, 'Data Destinasi Berhasil Dihapus!', null);
+        return new APIResource(true, 'Data Destinasi Berhasil Dihapus!', null);
     }
 }

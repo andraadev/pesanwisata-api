@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserResource;
+use App\Http\Resources\APIResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +16,7 @@ class UserController extends Controller
     public function index()
     {
         $user = DB::table('users')->get();
-        return new UserResource(true, "Data User", $user);
+        return new APIResource(true, "Data User", $user);
     }
 
     /**
@@ -43,7 +43,7 @@ class UserController extends Controller
             'password' => bcrypt($request->password),
             'role' => $request->role
         ]);
-        return new UserResource(true, "Selamat datang, user baru!", $user);
+        return new APIResource(true, "Selamat datang, user baru!", $user);
     }
 
     /**
@@ -77,7 +77,7 @@ class UserController extends Controller
             'role' => $request->role
         ]);
 
-        return new UserResource(true, "Data User Berhasil Diubah!", $user);
+        return new APIResource(true, "Data User Berhasil Diubah!", $user);
     }
 
     /**
@@ -93,6 +93,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return new UserResource(true, "Data User Berhasil Dihapus!", null);
+        return new APIResource(true, "Data User Berhasil Dihapus!", null);
     }
 }
