@@ -7,6 +7,7 @@ use App\Models\Destination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
 class DestinationController extends Controller
@@ -18,7 +19,7 @@ class DestinationController extends Controller
     {
         $destination = Destination::all();
 
-        return new APIResource(true, 'List Data Destination', $destination);
+        return new APIResource(true, 'List Data Destinasi', $destination);
     }
 
     /**
@@ -42,13 +43,13 @@ class DestinationController extends Controller
 
         $destination = Destination::create([
             'name'     => $request->name,
-            'slug' => $request->slug,
+            'slug' => Str::slug($request->name),
             'location'   => $request->location,
             'description' => $request->description,
             'image_url'     => $image->hashName(),
         ]);
 
-        return new APIResource(true, 'Data Post Berhasil Ditambahkan!', $destination);
+        return new APIResource(true, 'Data Destinasi Berhasil Ditambahkan!', $destination);
     }
 
     /**
@@ -60,7 +61,7 @@ class DestinationController extends Controller
         if (!$destination) {
             return response()->json([
                 'success' => false,
-                'message' => 'destinasi tidak ditemukan'
+                'message' => 'Destinasi Tidak Ditemukan!'
             ], 404);
         }
 
@@ -90,7 +91,7 @@ class DestinationController extends Controller
 
             $destination->update([
                 'name' => $request->name,
-                'slug' => $request->slug,
+                'slug' => Str::slug($request->name),
                 'location' => $request->location,
                 'description' => $request->description,
                 'image_url' => $image->hashName(),
@@ -98,12 +99,12 @@ class DestinationController extends Controller
         } else {
             $destination->update([
                 'name' => $request->name,
-                'slug' => $request->slug,
+                'slug' => Str::slug($request->name),
                 'location' => $request->location,
                 'description' => $request->description,
             ]);
         }
-        return new APIResource(true, 'Data destinasi berhasil diubah', $destination);
+        return new APIResource(true, 'Data Destinasi Berhasil Diubah!', $destination);
     }
 
     /**
