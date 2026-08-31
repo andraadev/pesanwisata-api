@@ -6,6 +6,11 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+Route::apiResource('/users', UserController::class);
+Route::apiResource('/destinations', DestinationController::class);
+Route::get('/destination/{slug}', [DestinationController::class, 'show']);
+Route::apiResource('/booking', BookingController::class);
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
