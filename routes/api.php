@@ -6,7 +6,7 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('/users', UserController::class);
+Route::apiResource('/users', UserController::class)->only('index');
 // Route::apiResource('/destinations', DestinationController::class)->parameters(['destinations' => 'slug'])->only(['index', 'show']);
 Route::apiResource('/destinations', DestinationController::class)->only(['index', 'show']);
 Route::apiResource('/booking', BookingController::class)->only(['index', 'store']);
