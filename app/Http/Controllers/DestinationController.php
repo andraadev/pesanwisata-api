@@ -55,9 +55,10 @@ class DestinationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Destination $destination)
+    public function show(string $destination)
     {
-        $destination = Destination::where('slug', $id)->first();
+        // dd($destination);
+        $destination = Destination::where('slug', $destination)->first();
         if (!$destination) {
             return response()->json([
                 'success' => false,
