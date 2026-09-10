@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\APIResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,36 +13,40 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = [
-            "email" => $request->email,
-            "password" => $request->password,
-        ];
+        $validator = Validator::make($request->all(), [
+            "email" => "required|email",
+            "password" => "required",
+        ]);
 
-        $user = User::where("email", $credentials["email"])->first();
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
+        $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            /** @var \App\Models\User $user */
             $token = $user->createToken("token")->plainTextToken;
-            return response()->json([
-                "status" => "success",
-                "status_code" => 200,
-                "message" => "Login berhasil",
-                "token" => $token
-            ]);
+
+            $data = [
+                'user'  => $user,
+                'token' => $token,
+            ];
+            return new APIResource(true, "Login berhasil", $data);
         } else {
-            return response()->json([
-                "status" => "failure",
-                "status_code" => 401,
-                "message" => "Login gagal!"
-            ]);
+            return (new APIResource(false, "Login gagal! Email atau password salah.", null))
+                ->response()
+                ->setStatusCode(401);
         }
     }
 
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "name" => "required|min:5",
-            "email" => "required|email:dns|unique:users",
-            "password" => "required|min:8",
+            "name"             => "required|min:5",
+            "email"            => "required|email:dns|unique:users",
+            "password"         => "required|min:8",
             "confirm_password" => "required|min:8|same:password"
         ]);
 
@@ -50,16 +55,12 @@ class AuthController extends Controller
         }
 
         $addUser = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
+            "name"     => $request->name,
+            "email"    => $request->email,
             "password" => Hash::make($request->password),
-            "role" => "User"
+            "role"     => "User"
         ]);
 
-        return response()->json([
-            "status" => "success",
-            "message" => "Registrasi User Berhasil",
-            "data" => $addUser
-        ]);
+        return new APIResource(true, "Registrasi User Berhasil", $addUser);
     }
 }
