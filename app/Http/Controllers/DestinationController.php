@@ -28,10 +28,10 @@ class DestinationController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|min:5',
-            'location'     => 'required',
-            'description'   => 'nullable',
-            'image_url'     => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name'        => 'required|min:5',
+            'location'    => 'required',
+            'description' => 'nullable',
+            'image_url'   => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -39,14 +39,15 @@ class DestinationController extends Controller
         }
 
         $image = $request->file('image_url');
-        $image->storeAs('public/destinations_image', $image->hashName());
+        $path = $image->store('destinations', 'public');
 
+        // 2. Simpan ke Database
         $destination = Destination::create([
-            'name'     => $request->name,
-            'slug' => Str::slug($request->name),
-            'location'   => $request->location,
+            'name'        => $request->name,
+            'slug'        => Str::slug($request->name),
+            'location'    => $request->location,
             'description' => $request->description,
-            'image_url'     => $image->hashName(),
+            'image_url'   => $path,
         ]);
 
         return new APIResource(true, 'Data Destinasi Berhasil Ditambahkan!', $destination);
