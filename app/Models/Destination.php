@@ -17,11 +17,20 @@ class Destination extends Model
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
+    protected $appends = ['image_url'];
 
-    protected function image(): Attribute
+    protected function imageUrl(): Attribute
     {
         return Attribute::make(
-            get: fn($image) => url('/storage/destinations_image/' . $image),
+            get: function ($value) {
+                if (!$value) return null;
+
+                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                    return $value;
+                }
+
+                return asset('storage/' . $value);
+            }
         );
     }
 }
