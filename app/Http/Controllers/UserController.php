@@ -48,6 +48,11 @@ class UserController extends Controller
         return new APIResource(true, "User baru berhasil dibuat", $user);
     }
 
+    public function show(User $user)
+    {
+        return new APIResource(true, "List user berdasarkan ID", $user);
+    }
+
     /**
      * Update the specified resource in storage.
      */
