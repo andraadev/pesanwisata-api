@@ -6,7 +6,9 @@ use App\Http\Resources\APIResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -24,75 +26,69 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // try {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|max:100',
             'email' => 'required|email|unique:users',
-            'password' => 'required',
-            'role' => 'required'
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|same:password',
+            'role' => 'required|in:Admin,User'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        // $user = DB::table('users')->insert($request->all());
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
             'role' => $request->role
         ]);
-        return new APIResource(true, "Selamat datang, user baru!", $user);
+
+        return new APIResource(true, "User baru berhasil dibuat", $user);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'role' => 'required'
+            'name' => 'required|max:100',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'password' => 'nullable|min:8',
+            'confirm_password' => 'nullable|required_with:password|same:password',
+            'role' => 'required|in:Admin,User'
         ]);
 
-        // Jika validasi gagal (salah satu input-an tidak diisi, dsb....)
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $user = User::find($id);
-        // Jika ID tidak ditemukan, maka sistem akan memberikan pesan error "ID tidak ditemukan"
-        if (!$user) {
-            return response()->json(["error" => 'ID tidak ditemukan.'], 404);
+        $updateData = [
+            'name'  => $request->name,
+            'email' => $request->email,
+            'role'  => $request->role,
+        ];
+
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
         }
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            // Jika password diganti, dia akan meng-hash ulang, dan jika password yang diinputkan masih sama, maka ia akan menggunakan password itu.
-            'password' => $request->password ? bcrypt($request->password) : $user->password,
-            'role' => $request->role
-        ]);
-
+        $user->update($updateData);
         return new APIResource(true, "Data User Berhasil Diubah!", $user);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        $user = User::find($id);
-        // Jika ID tidak ditemukan, maka sistem akan memberikan pesan error "ID tidak ditemukan"
-        if (!$user) {
-            return response()->json(["error" => 'ID tidak ditemukan.'], 404);
-        }
-
         $user->delete();
-
         return new APIResource(true, "Data User Berhasil Dihapus!", null);
     }
 }
