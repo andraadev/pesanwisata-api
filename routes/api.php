@@ -11,10 +11,15 @@ Route::apiResource('/destinations', DestinationController::class)->only(['index'
 Route::apiResource('/booking', BookingController::class)->only(['index', 'store']);
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::apiResource('admin/users', UserController::class);
+    Route::apiResource('admin/users', UserController::class)->missing(function () {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan.'
+        ], 404);
+    });;
     Route::apiResource('admin/destinations', DestinationController::class);
     Route::get('admin/destination/{slug}', [DestinationController::class, 'show']);
     Route::apiResource('admin/booking', BookingController::class);
