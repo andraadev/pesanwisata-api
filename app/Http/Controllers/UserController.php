@@ -30,7 +30,6 @@ class UserController extends Controller
             'name' => 'required|max:100',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8',
-            'confirm_password' => 'required|same:password',
             'role' => 'required|in:Admin,User'
         ]);
 
@@ -66,7 +65,6 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => 'nullable|min:8',
-            'confirm_password' => 'nullable|required_with:password|same:password',
             'role' => 'required|in:Admin,User'
         ]);
 
