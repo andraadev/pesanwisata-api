@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = DB::table('users')->get();
+        $user = User::all();
         return new APIResource(true, "Data User", $user);
     }
 
