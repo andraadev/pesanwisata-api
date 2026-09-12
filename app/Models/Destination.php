@@ -11,7 +11,6 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[Fillable(['name', 'slug', 'location', 'description', 'image_url'])]
-#[Hidden(['password', 'remember_token'])]
 
 class Destination extends Model
 {
