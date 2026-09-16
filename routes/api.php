@@ -19,8 +19,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'success' => false,
             'message' => 'Data tidak ditemukan.'
         ], 404);
+    });
+    Route::apiResource('admin/destinations', DestinationController::class)->missing(function () {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan.'
+        ], 404);
     });;
-    Route::apiResource('admin/destinations', DestinationController::class);
-    Route::get('admin/destination/{slug}', [DestinationController::class, 'show']);
+    // Route::get('admin/destination/{slug}', [DestinationController::class, 'show']);
     Route::apiResource('admin/booking', BookingController::class);
 });
