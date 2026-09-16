@@ -29,8 +29,8 @@ class DestinationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'        => 'required|min:5',
-            'location'    => 'required',
-            'description' => 'nullable',
+            'location'    => 'required|max:100',
+            'description' => 'nullable|max:100',
             'image_url'   => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -41,7 +41,6 @@ class DestinationController extends Controller
         $image = $request->file('image_url');
         $path = $image->store('destinations', 'public');
 
-        // 2. Simpan ke Database
         $destination = Destination::create([
             'name'        => $request->name,
             'slug'        => Str::slug($request->name),
@@ -56,17 +55,8 @@ class DestinationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $destination)
+    public function show(Destination $destination)
     {
-        // dd($destination);
-        $destination = Destination::where('slug', $destination)->first();
-        if (!$destination) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Destinasi Tidak Ditemukan!'
-            ], 404);
-        }
-
         return new APIResource(true, 'Data Destinasi', $destination);
     }
 
@@ -76,37 +66,41 @@ class DestinationController extends Controller
     public function update(Request $request, Destination $destination)
     {
         $validator = Validator::make($request->all(), [
-            'name'      => 'required|min:5',
-            'location'  => 'required',
-            'description' => 'nullable',
+            'name'        => 'required|min:5',
+            'location'    => 'required|max:100',
+            'description' => 'required|max:100',
+            'image_url'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        if ($request->hasFile('image')) {
+        $data = [
+            'name'        => $request->name,
+            'slug'        => Str::slug($request->name),
+            'location'    => $request->location,
+            'description' => $request->description,
+        ];
+
+        if ($request->hasFile('image_url')) {
             $image = $request->file('image_url');
-            $image->storeAs('public/destination_image', $image->hashName());
+            $path = $image->store('destinations', 'public');
 
-            Storage::delete('public/destination_image/' . basename($destination->image_url));
+            if ($destination->image_url) {
+                Storage::disk('public')->delete($destination->image_url);
+            }
 
-            $destination->update([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'location' => $request->location,
-                'description' => $request->description,
-                'image_url' => $image->hashName(),
-            ]);
-        } else {
-            $destination->update([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'location' => $request->location,
-                'description' => $request->description,
-            ]);
+            $data['image_url'] = $path;
         }
-        return new APIResource(true, 'Data Destinasi Berhasil Diubah!', $destination);
+
+        $destination->update($data);
+
+        return new APIResource(
+            true,
+            'Data Destinasi Berhasil Diubah!',
+            $destination
+        );
     }
 
     /**
@@ -114,7 +108,7 @@ class DestinationController extends Controller
      */
     public function destroy(Destination $destination)
     {
-        Storage::delete('public/destination_image/' . basename($destination->image_url));
+        Storage::disk('public')->delete($destination->image_url);
 
         $destination->delete();
 
