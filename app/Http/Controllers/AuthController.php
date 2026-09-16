@@ -54,13 +54,17 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $addUser = User::create([
+        $user = User::create([
             "name"     => $request->name,
             "email"    => $request->email,
             "password" => Hash::make($request->password),
             "role"     => "User"
         ]);
 
-        return new APIResource(true, "Registrasi User Berhasil", $addUser);
+        $token = $user->createToken("token")->plainTextToken;
+
+        $data = ['user' => $user, 'token' => $token,];
+
+        return new APIResource(true, "Registrasi User Berhasil", $data);
     }
 }
