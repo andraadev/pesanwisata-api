@@ -67,4 +67,11 @@ class AuthController extends Controller
 
         return new APIResource(true, "Registrasi User Berhasil", $data);
     }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return new APIResource(true, "Berhasil keluar", null);
+    }
 }

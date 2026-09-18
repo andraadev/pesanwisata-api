@@ -44,3 +44,5 @@ Route::middleware([
 ])->group(function () {
     Route::apiResource('/booking', BookingController::class)->only(['index', 'store']);
 });
+
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
