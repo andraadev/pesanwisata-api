@@ -6,13 +6,21 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('/users', UserController::class)->only('index');
-Route::apiResource('/destinations', DestinationController::class)->only(['index', 'show']);
+Route::middleware('throttle:api')->group(function () {
+    Route::apiResource('/users', UserController::class)->only('index');
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::apiResource('/destinations', DestinationController::class)
+        ->only(['index', 'show']);
+});
 
-Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
+
+Route::middleware('throttle:auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login'])
+        ->name('login');
+});
+
+Route::middleware(['auth:sanctum', 'role:Admin', 'throttle:admin'])->group(function () {
     Route::apiResource('admin/users', UserController::class)->missing(function () {
         return response()->json([
             'success' => false,
@@ -29,6 +37,10 @@ Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
     Route::apiResource('admin/booking', BookingController::class);
 });
 
-Route::middleware(['auth:sanctum', 'role:User'])->group(function () {
+Route::middleware([
+    'auth:sanctum',
+    'role:User',
+    'throttle:api',
+])->group(function () {
     Route::apiResource('/booking', BookingController::class)->only(['index', 'store']);
 });
