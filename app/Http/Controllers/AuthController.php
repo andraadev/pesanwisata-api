@@ -25,14 +25,12 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-
-            /** @var \App\Models\User $user */
-            $token = $user->createToken("token")->plainTextToken;
+            $request->session()->regenerate();
 
             $data = [
                 'user'  => $user,
-                'token' => $token,
             ];
+
             return new APIResource(true, "Login berhasil", $data);
         } else {
             return (new APIResource(false, "Login gagal! Email atau password salah.", null))
@@ -61,16 +59,18 @@ class AuthController extends Controller
             "role"     => "User"
         ]);
 
-        $token = $user->createToken("token")->plainTextToken;
+        Auth::login($user);
+        $request->session()->regenerate();
 
-        $data = ['user' => $user, 'token' => $token,];
-
+        $data = ['user' => $user];
         return new APIResource(true, "Registrasi User Berhasil", $data);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return new APIResource(true, "Berhasil keluar", null);
     }
