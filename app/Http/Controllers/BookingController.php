@@ -12,16 +12,19 @@ class BookingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $booking = Booking::join("users", "users.id", "=", "bookings.user_id")
-            ->join("destinations", "destinations.id", "=", "bookings.destination_id")
-            ->select("users.name as name", "destinations.name as destination", "bookings.booking_date", "bookings.status")
+        $user = $request->user();
+
+        $bookings = Booking::with(['user:id,name', 'destination:id,name,image_url'])
+            ->when($user->role !== 'Admin', function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
+            })
+            ->latest()
             ->get();
 
-        return new APIResource(true, 'List Data Booking', $booking);
+        return new APIResource(true, 'List Data Booking', $bookings);
     }
-
 
     /**
      * Store a newly created resource in storage.
