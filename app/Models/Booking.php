@@ -16,4 +16,13 @@ class Booking extends Model
 {
     /** @use HasFactory<BookingFactory> */
     use HasFactory, Notifiable, HasApiTokens;
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class);
+    }
 }
