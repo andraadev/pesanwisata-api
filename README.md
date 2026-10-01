@@ -2,10 +2,10 @@
 
 # PesanWisata API
 
-A Laravel-based RESTful API service for tourism destination management and tour booking system with Sanctum token authentication, destination catalog with image handling, role-based workflows, and booking management.
+A Laravel-based RESTful API for managing tourism destinations, user accounts, and tour bookings with role-based access control and session-based authentication using Laravel Sanctum.
 
-[![Laravel](https://img.shields.io/badge/Laravel-11%2B-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![Sanctum](https://img.shields.io/badge/Sanctum-Auth-F05340?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/docs/sanctum)
 [![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
 
@@ -15,22 +15,21 @@ A Laravel-based RESTful API service for tourism destination management and tour 
 
 ## 📌 Project Overview
 
-**PesanWisata API** is a Laravel-powered RESTful API backend designed to manage tourist destinations, user accounts, and travel/tour booking transactions.
+PesanWisata API serves as the backend for the PesanWisata tourism booking application. It provides API endpoints for authentication, destination management, and booking operations for Admin and User (Customer) roles.
 
-The system provides role-based workflows for **Admin** and **User (Customer)**, handling authentication, destination catalog management with media upload, slug-based destination routing, and tour booking operations.
+The API connects with the companion frontend client:
 
-This backend serves as the core API service and connects directly with the companion frontend client:
-
-- 🌐 **Frontend Repository**: [pesanWisata-FE](https://github.com/andraadev/pesanWisata-FE)
+🌐 Frontend Repository: [pesanwisata](https://github.com/andraadev/pesanwisata)
 
 ---
 
 ## ✨ Key Features
 
-- **Token-Based Authentication (Laravel Sanctum)**
+- **Session-Based Authentication (Laravel Sanctum)**
     - Secure user registration and login endpoints.
-    - Bearer token issuance and revocation for authenticated API requests.
-    - Password hashing using `bcrypt`.
+    - SPA authentication using session cookies.
+    - Protected API requests using authenticated sessions.
+    - Automatic password hashing.
 
 - **Destination Management**
     - Complete CRUD operations for tourist destinations.
@@ -39,13 +38,13 @@ This backend serves as the core API service and connects directly with the compa
     - Detailed destination attributes: title, slug, location, description, and photo.
 
 - **Tour Booking System**
-    - Create, view, update, and cancel destination bookings.
-    - Association between users, destinations, booking dates, and status.
-    - Joined relational queries for seamless data retrieval.
+    - Users can create bookings and view their booking history.
+    - Admins can view all booking records.
+    - Bookings are associated with users, destinations, booking dates, and status.
 
 - **Role-Based Access Control (RBAC)**
     - Separate roles: **Admin** and **User**.
-    - Secured admin endpoints protected by `auth:sanctum` middleware.
+    - Protected endpoints use authentication and role-based middleware to enforce access control.
 
 - **User Management**
     - Admin CRUD access for system users and role administration.
@@ -67,7 +66,7 @@ This backend serves as the core API service and connects directly with the compa
 
 | Role                | Responsibilities                                                                                                                 |
 | :------------------ | :------------------------------------------------------------------------------------------------------------------------------- |
-| **Admin**           | Manage tourism destinations (CRUD, image uploads), manage users and roles, review and update all tourist booking records.        |
+| **Admin**           | Manage tourism destinations (CRUD, image uploads), manage users and roles, review tourist booking records.                       |
 | **User (Customer)** | Register and login, browse destination catalog and details by slug, create tour bookings, and view personal booking information. |
 
 ---
@@ -76,32 +75,29 @@ This backend serves as the core API service and connects directly with the compa
 
 ### 1. Authentication
 
-| Method | Endpoint        | Description                               | Auth Required |
-| :----- | :-------------- | :---------------------------------------- | :------------ |
-| `POST` | `/api/register` | Register a new user account               | No            |
-| `POST` | `/api/login`    | Authenticate user and obtain Bearer token | No            |
+| Method | Endpoint        | Description                    | Auth Required |
+| :----- | :-------------- | :----------------------------- | :------------ |
+| `POST` | `/api/register` | Register a new user account    | No            |
+| `POST` | `/api/login`    | Authenticate user              | No            |
+| `POST` | `/api/logout`   | Log out the authenticated user | Yes           |
 
 ### 2. Destinations
 
-| Method     | Endpoint                       | Description                                               | Auth Required   |
-| :--------- | :----------------------------- | :-------------------------------------------------------- | :-------------- |
-| `GET`      | `/api/destinations`            | List all available destinations                           | No              |
-| `GET`      | `/api/destination/{slug}`      | Get destination details by slug                           | No              |
-| `POST`     | `/api/admin/destinations`      | Create a new destination (multipart/form-data with image) | Yes (`Sanctum`) |
-| `GET`      | `/api/admin/destinations/{id}` | Get destination detail by ID                              | Yes (`Sanctum`) |
-| `PUT/POST` | `/api/admin/destinations/{id}` | Update destination information or photo                   | Yes (`Sanctum`) |
-| `DELETE`   | `/api/admin/destinations/{id}` | Delete a destination and its image                        | Yes (`Sanctum`) |
+| Method     | Endpoint                                | Description                                               | Auth Required   |
+| :--------- | :-------------------------------------- | :-------------------------------------------------------- | :-------------- |
+| `GET`      | `/api/destinations`                     | List all available destinations                           | No              |
+| `GET`      | `/api/destinations/{destination}`       | Get destination details by slug                           | No              |
+| `POST`     | `/api/admin/destinations`               | Create a new destination (multipart/form-data with image) | Yes (`Sanctum`) |
+| `GET`      | `/api/admin/destinations/{destination}` | Get destination detail by ID                              | Yes (`Sanctum`) |
+| `PUT/POST` | `/api/admin/destinations/{destination}` | Update destination information or photo                   | Yes (`Sanctum`) |
+| `DELETE`   | `/api/admin/destinations/{destination}` | Delete a destination and its image                        | Yes (`Sanctum`) |
 
 ### 3. Bookings
 
-| Method   | Endpoint               | Description                                             | Auth Required   |
-| :------- | :--------------------- | :------------------------------------------------------ | :-------------- |
-| `GET`    | `/api/booking`         | List all booking records with user and destination info | No / Optional   |
-| `POST`   | `/api/booking`         | Create a new tour booking                               | No / Optional   |
-| `GET`    | `/api/booking/{id}`    | Get booking details                                     | No / Optional   |
-| `PUT`    | `/api/booking/{id}`    | Update booking data / status                            | No / Optional   |
-| `DELETE` | `/api/booking/{id}`    | Remove a booking record                                 | No / Optional   |
-| `*`      | `/api/admin/booking/*` | Administrative booking resource management              | Yes (`Sanctum`) |
+| Method | Endpoint             | Description                                             | Auth Required   |
+| :----- | :------------------- | :------------------------------------------------------ | :-------------- |
+| `GET`  | `/api/admin/booking` | List all booking records with user and destination info | Yes (`Sanctum`) |
+| `POST` | `/api/user/booking`  | Create a new tour booking                               | Yes (`Sanctum`) |
 
 ### 4. User Management
 
@@ -118,10 +114,9 @@ This backend serves as the core API service and connects directly with the compa
 ## 🛠️ Tech Stack
 
 - **PHP 8.3+**
-- **Laravel Framework 11+**
-- **Laravel Sanctum** (API Token Authentication)
+- **Laravel**
+- **Laravel Sanctum**
 - **MySQL / SQLite**
-- **RESTful API Architecture**
 
 ---
 
@@ -131,7 +126,6 @@ This backend serves as the core API service and connects directly with the compa
 | :-------------------------------------------------- | :----------------------------- | :------ |
 | [Laravel Sanctum](https://laravel.com/docs/sanctum) | Token-based API authentication | Used ✅ |
 | [Laravel Framework](https://laravel.com/)           | Core application framework     | Used ✅ |
-| [Laravel Tinker](https://github.com/laravel/tinker) | Interactive CLI runtime shell  | Used ✅ |
 
 ---
 
@@ -200,43 +194,6 @@ This backend serves as the core API service and connects directly with the compa
 7. The API will be accessible at:
 
     `http://127.0.0.1:8000/api`
-
----
-
-## 🔐 Authentication & Default Credentials
-
-> Default seeded accounts are intended for development and testing purposes only.
-
-- **Test User**
-    - Email: `test@example.com`
-    - Password: `password`
-
-### Using the API Token
-
-When making requests to protected routes, include the Bearer token in the `Authorization` header:
-
-```http
-Authorization: Bearer <your_access_token>
-Accept: application/json
-```
-
----
-
-## 🔗 Related Repository
-
-- **Frontend Client**: [pesanWisata-FE](https://github.com/andraadev/pesanWisata-FE) — The client-side user interface connecting to this API backend.
-
----
-
-## 📌 Project Status
-
-> **Maintained, but development is limited**
-
-This project was developed as a backend API service for a tourism and travel destination booking platform.
-
-The application has reached a functional state for its intended scope and is maintained for critical bug fixes, security improvements, and necessary adjustments. Future feature development is not guaranteed and may depend on project needs.
-
-The project is primarily provided for educational, reference, and portfolio purposes and is **not recommended for production use without further security review, testing, and environment-specific configuration**.
 
 ---
 
