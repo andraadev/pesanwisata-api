@@ -32,17 +32,22 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'booking_date' => 'required|date',
-            'user_id' => 'required|integer|exists:users,id',
+            'booking_date' => 'required|date|after_or_equal:today',
             'destination_id' => 'required|integer|exists:destinations,id',
-            'status' => 'required|max:50'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $booking = Booking::create($request->all());
+        $booking = Booking::create(
+            [
+                'booking_date' => $request->booking_date,
+                'user_id' =>  $request->user()->id,
+                'destination_id' => $request->destination_id,
+                'status' => 'Selesai'
+            ]
+        );
         return new APIResource(true, 'Data Booking Berhasil Ditambahkan!', $booking);
     }
 
@@ -52,17 +57,19 @@ class BookingController extends Controller
     public function update(Request $request, Booking $booking)
     {
         $validator = Validator::make($request->all(), [
-            'booking_date' => 'required|date',
-            'user_id' => 'required|integer|exists:users,id',
+            'booking_date' => 'required|date|after_or_equal:today',
             'destination_id' => 'required|integer|exists:destinations,id',
-            'status' => 'required|max:50'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $booking->update($request->all());
+        $booking->update([
+            'booking_date' => $request->booking_date,
+            'destination_id' => $request->destination_id,
+        ]);
+
         return new APIResource(true, 'Data Booking Berhasil Diubah!', $booking);
     }
 
