@@ -108,7 +108,11 @@ class DestinationController extends Controller
      */
     public function destroy(Destination $destination)
     {
-        Storage::disk('public')->delete($destination->image_url);
+        $imagePath = $destination->getRawOriginal('image_url');
+
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
 
         $destination->delete();
 
