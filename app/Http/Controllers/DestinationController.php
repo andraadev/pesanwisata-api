@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Resources\APIResource;
 use App\Models\Destination;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
