@@ -15,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 class Booking extends Model
 {
     /** @use HasFactory<BookingFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory;
     public function user()
     {
         return $this->belongsTo(User::class);

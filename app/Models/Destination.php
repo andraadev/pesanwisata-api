@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class Destination extends Model
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory;
     protected $appends = ['image_url'];
 
     protected function imageUrl(): Attribute
