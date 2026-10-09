@@ -43,7 +43,7 @@ class DestinationController extends Controller
 
         $destination = Destination::create([
             'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
+            'slug'        => $this->generateUniqueSlug($request->name),
             'location'    => $request->location,
             'description' => $request->description,
             'image_url'   => $path,
@@ -78,7 +78,7 @@ class DestinationController extends Controller
 
         $data = [
             'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
+            'slug'        => $this->generateUniqueSlug($request->name, $destination->id),
             'location'    => $request->location,
             'description' => $request->description,
         ];
@@ -117,5 +117,26 @@ class DestinationController extends Controller
         $destination->delete();
 
         return new APIResource(true, 'Data Destinasi Berhasil Dihapus!', null);
+    }
+
+    /**
+     * Generate unique slug for destination.
+     */
+    private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (
+            Destination::where('slug', $slug)
+                ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+
+        return $slug;
     }
 }
