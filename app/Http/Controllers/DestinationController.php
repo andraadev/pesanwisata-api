@@ -30,7 +30,7 @@ class DestinationController extends Controller
         $validator = Validator::make($request->all(), [
             'name'        => 'required|min:5',
             'location'    => 'required|max:100',
-            'description' => 'nullable|max:100',
+            'description' => 'required|max:100',
             'image_url'   => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -130,8 +130,8 @@ class DestinationController extends Controller
 
         while (
             Destination::where('slug', $slug)
-                ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
-                ->exists()
+            ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()
         ) {
             $slug = "{$originalSlug}-{$count}";
             $count++;
