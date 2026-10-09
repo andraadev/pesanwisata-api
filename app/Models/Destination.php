@@ -16,7 +16,6 @@ class Destination extends Model
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
-    protected $appends = ['image_url'];
 
     protected function imageUrl(): Attribute
     {
