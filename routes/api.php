@@ -33,7 +33,7 @@ Route::middleware(['auth:sanctum', 'role:Admin', 'throttle:admin'])->group(funct
             'message' => 'Data tidak ditemukan.'
         ], 404);
     });;
-    Route::apiResource('admin/booking', BookingController::class);
+    Route::apiResource('admin/bookings', BookingController::class);
 });
 
 Route::middleware([
@@ -41,5 +41,5 @@ Route::middleware([
     'role:User',
     'throttle:api',
 ])->group(function () {
-    Route::apiResource('/booking', BookingController::class)->only(['index', 'store']);
+    Route::apiResource('/bookings', BookingController::class)->only(['index', 'store']);
 });
