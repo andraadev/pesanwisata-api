@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestinationFormRequest;
 use App\Http\Resources\APIResource;
 use App\Models\Destination;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
 
 class DestinationController extends Controller
 {
@@ -24,19 +23,8 @@ class DestinationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(DestinationFormRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name'        => 'required|min:5',
-            'location'    => 'required|max:100',
-            'description' => 'required|max:100',
-            'image_url'   => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         $image = $request->file('image_url');
         $path = $image->store('destinations', 'public');
 
@@ -62,19 +50,8 @@ class DestinationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Destination $destination)
+    public function update(DestinationFormRequest $request, Destination $destination)
     {
-        $validator = Validator::make($request->all(), [
-            'name'        => 'required|min:5',
-            'location'    => 'required|max:100',
-            'description' => 'required|max:100',
-            'image_url'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         $data = [
             'name'        => $request->name,
             'slug'        => $this->generateUniqueSlug($request->name, $destination->id),
