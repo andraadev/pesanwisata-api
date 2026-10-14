@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BookingFormRequest;
 use App\Http\Resources\APIResource;
 use App\Models\Booking;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
@@ -29,17 +29,8 @@ class BookingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BookingFormRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'booking_date' => 'required|date|after_or_equal:today',
-            'destination_id' => 'required|integer|exists:destinations,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         $booking = Booking::create(
             [
                 'booking_date' => $request->booking_date,
@@ -54,17 +45,8 @@ class BookingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Booking $booking)
+    public function update(BookingFormRequest $request, Booking $booking)
     {
-        $validator = Validator::make($request->all(), [
-            'booking_date' => 'required|date|after_or_equal:today',
-            'destination_id' => 'required|integer|exists:destinations,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         $booking->update([
             'booking_date' => $request->booking_date,
             'destination_id' => $request->destination_id,
