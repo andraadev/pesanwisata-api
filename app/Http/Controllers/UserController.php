@@ -87,9 +87,20 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+
+    public function destroy(Request $request, User $user)
     {
+        if ($request->user()->id === $user->id) {
+            logger()->info('Blocked: deleting own account');
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak dapat menghapus akun sendiri.',
+                'data' => null,
+            ], 403);
+        }
+
         $user->delete();
-        return new APIResource(true, "Data User Berhasil Dihapus!", null);
+
+        return new APIResource(true, 'Data User Berhasil Dihapus!', null);
     }
 }
