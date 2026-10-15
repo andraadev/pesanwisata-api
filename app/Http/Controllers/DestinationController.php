@@ -15,7 +15,7 @@ class DestinationController extends Controller
      */
     public function index()
     {
-        $destination = Destination::all();
+        $destination = Destination::paginate(15);
 
         return new APIResource(true, 'List Data Destinasi', $destination);
     }

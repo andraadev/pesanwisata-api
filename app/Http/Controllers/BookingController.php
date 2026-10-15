@@ -21,7 +21,7 @@ class BookingController extends Controller
                 return $query->where('user_id', $user->id);
             })
             ->latest()
-            ->get();
+            ->paginate(15);
 
         return new APIResource(true, 'List Data Booking', $bookings);
     }
