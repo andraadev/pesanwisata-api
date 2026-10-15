@@ -19,6 +19,10 @@ class APIResource extends JsonResource
      * @param  mixed $resource
      * @return void
      */
+
+    /**
+     * @mixin \Illuminate\Database\Eloquent\Model
+     */
     public function __construct($status, $message, $resource)
     {
         parent::__construct($resource);
@@ -31,6 +35,10 @@ class APIResource extends JsonResource
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     */
+
+    /**
+     * @mixin \Illuminate\Database\Eloquent\Model
      */
     public function toArray($request)
     {
